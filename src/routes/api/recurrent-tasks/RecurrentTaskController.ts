@@ -1,3 +1,4 @@
+import { RecurrentTaskModel } from '@models/RecurrentTask';
 import { RouteOptions, FastifyRequest, FastifyReply } from 'fastify';
 import { ServerResponse } from 'http';
 import BaseController from '@routes/BaseController';
@@ -114,6 +115,7 @@ class RecurrentTaskController extends BaseController {
     ];
   }
 
+<<<<<<< HEAD
   private async createRecurrentTask(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
     const newRecurrentTask = new RecurrentTaskModel(request.body);
 
@@ -158,9 +160,56 @@ class RecurrentTaskController extends BaseController {
     await RecurrentTaskModel.findOneAndDelete({ _id: request.params.recurrentTaskId });
 
     reply.status(200);
+=======
+  private createRecurrentTask(
+    request: FastifyRequest,
+    reply: FastifyReply<ServerResponse>
+  ): void {
+    reply.send({ message: 'It has not been implemented yet.' });
   }
 
-  private searchRecurrentTasks(request: FastifyRequest, reply: FastifyReply<ServerResponse>): void {
+  private getRecurrentTask(
+    request: FastifyRequest,
+    reply: FastifyReply<ServerResponse>
+  ): void {
+    reply.send({ message: 'It has not been implemented yet.' });
+  }
+
+  private updateRecurrentTask(
+    request: FastifyRequest,
+    reply: FastifyReply<ServerResponse>
+  ): void {
+    reply.send({ message: 'It has not been implemented yet.' });
+  }
+
+  private async deleteRecurrentTask(
+    request: FastifyRequest,
+    reply: FastifyReply<ServerResponse>
+  ): Promise<any> {
+    const task = await RecurrentTaskModel.findById(
+      request.params.recurrentTaskID
+    );
+
+    if (!task) {
+      return reply.status(404).send({
+        statusCode: 404,
+        error: 'Not Found',
+        message: 'Recurrent Task with the requested ID was not found'
+      });
+    }
+
+    await RecurrentTaskModel.findOneAndDelete({
+      _id: request.params.recurrentTaskID
+    });
+
+    reply.status(200).send();
+>>>>>>> add delete RecurrentTask
+  }
+
+  private searchRecurrentTasks(
+    request: FastifyRequest,
+    reply: FastifyReply<ServerResponse>
+  ): void {
     reply.send({ message: 'It has not been implemented yet.' });
   }
 
