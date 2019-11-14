@@ -15,7 +15,8 @@
       "@utils/*": ["src/utils/*"],
       "@routes/*": ["src/routes/*"],
       "@models/*": ["src/models/*"],
-      "@schemas/*": ["src/schemas/*"]
+      "@schemas/*": ["src/schemas/*"],
+      "@services/*": ["src/services/*"]
     },
     "lib": ["es2017", "dom"]
   },

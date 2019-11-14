@@ -1,7 +1,10 @@
+import { findAll } from '@services/recurrent-tasks/RecurrentTaskService';
+// import { findAll } from '@services/recurrentTaskService';
 import { RecurrentTaskModel } from '@models/RecurrentTask';
 import { RouteOptions, FastifyRequest, FastifyReply } from 'fastify';
 import { ServerResponse } from 'http';
 import BaseController from '@routes/BaseController';
+<<<<<<< HEAD
 import RecurrentTaskSchemaModels from '@schemas/recurrent-task/models';
 import RecurrentTaskSchemaRequests from '@schemas/recurrent-task/requests';
 import CommonSchemaRequests from '@schemas/common/requests';
@@ -10,6 +13,8 @@ import { TAGS } from '@schemas/common/tags';
 import RecurrentTaskModel from '@models/RecurrentTask';
 import NotFound404 from '@models/responses/NotFound404';
 
+=======
+>>>>>>> Add search api
 class RecurrentTaskController extends BaseController {
   public getRoutes(): RouteOptions[] {
     return [
@@ -190,6 +195,7 @@ class RecurrentTaskController extends BaseController {
       request.params.recurrentTaskID
     );
 
+    console.log('recuretnID', request.params.recurrentTaskID);
     if (!task) {
       return reply.status(404).send({
         statusCode: 404,
@@ -206,11 +212,49 @@ class RecurrentTaskController extends BaseController {
 >>>>>>> add delete RecurrentTask
   }
 
-  private searchRecurrentTasks(
+  private async searchRecurrentTasks(
     request: FastifyRequest,
     reply: FastifyReply<ServerResponse>
-  ): void {
-    reply.send({ message: 'It has not been implemented yet.' });
+  ): Promise<any> {
+    const { recurrentTaskID } = request.params;
+    console.log('id', recurrentTaskID);
+    const { search, fields, offset, limit, sort } = request.query;
+    const query = {
+      query: {},
+      search,
+      fields,
+      offset,
+      limit,
+      sort
+    };
+
+    if (search) query.search = search;
+    if (fields) query.fields = fields.split(',');
+    if (offset) query.offset = parseInt(offset, 10);
+    if (limit) query.limit = parseInt(limit, 10);
+    if (sort) query.sort = sort.split(',');
+    Object.keys(request.query)
+      .filter(
+        q => ['search', 'fields', 'offset', 'limit', 'sort'].indexOf(q) === -1
+      )
+      .forEach(q => {
+        if (['true', 'false'].includes(request.query[q])) {
+          query.query[q] = JSON.parse(request.query[q]);
+        } else {
+          query.query[q] = request.query[q];
+        }
+      });
+    console.log('demo', query);
+    const { recurrentTasks, count } = await findAll(query);
+    reply.status(200).send({
+      statusCode: 200,
+      messages: {
+        recurrentTasks,
+        metadata: {
+          total: count
+        }
+      }
+    });
   }
 
   private getRecurrentTasksByUserId(request: FastifyRequest, reply: FastifyReply<ServerResponse>): void {
