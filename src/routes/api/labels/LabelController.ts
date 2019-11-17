@@ -1,3 +1,4 @@
+// import { findAll } from '@services/labels/LabelService';
 import { RouteOptions, FastifyRequest, FastifyReply } from 'fastify';
 import { ServerResponse } from 'http';
 import BaseController from '@routes/BaseController';
@@ -73,7 +74,7 @@ class LabelController extends BaseController {
         }
       },
       {
-        method: 'GET',
+        method: 'POST',
         url: '/search',
         handler: this.searchLabels,
         schema: {
@@ -94,9 +95,23 @@ class LabelController extends BaseController {
     ];
   }
 
-  private async createLabel(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
+  private async createLabel(
+    request: FastifyRequest,
+    reply: FastifyReply<ServerResponse>
+  ): Promise<any> {
     const { name, color } = request.body;
 
+<<<<<<< HEAD
+=======
+    if (!name || !color) {
+      return reply.status(400).send({
+        code: 400,
+        error: 'Bad Request',
+        message: "Either the 'name' field or the 'color' field is missing"
+      });
+    }
+
+>>>>>>> update search api
     const newLabel = new LabelModel({ name, color });
 
     await newLabel.save();
@@ -104,8 +119,16 @@ class LabelController extends BaseController {
     reply.send(newLabel);
   }
 
+<<<<<<< HEAD
   private async getLabel(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
     const label = await LabelModel.findById(request.params.labelId);
+=======
+  private async getLabel(
+    request: FastifyRequest,
+    reply: FastifyReply<ServerResponse>
+  ): Promise<any> {
+    const label = await LabelModel.findById(request.params.labelID);
+>>>>>>> update search api
 
     if (!label) {
       return reply.status(404).send(NotFound404.generate(`Label with the requested ID '${request.params.labelId}' was not found`));
@@ -114,8 +137,24 @@ class LabelController extends BaseController {
     reply.send(label);
   }
 
+<<<<<<< HEAD
   private async updateLabel(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
     const label = await LabelModel.findById(request.params.labelId);
+=======
+  private async updateLabel(
+    request: FastifyRequest,
+    reply: FastifyReply<ServerResponse>
+  ): Promise<any> {
+    const label = await LabelModel.findById(request.params.labelID);
+
+    if (!label) {
+      return reply.status(404).send({
+        statusCode: 404,
+        error: 'Not Found',
+        message: 'Label with the requested ID was not found'
+      });
+    }
+>>>>>>> update search api
 
     const { name, color } = request.body;
 
@@ -143,8 +182,16 @@ class LabelController extends BaseController {
     reply.send(label);
   }
 
+<<<<<<< HEAD
   private async deleteLabel(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
     const label = await LabelModel.findById(request.params.labelId);
+=======
+  private async deleteLabel(
+    request: FastifyRequest,
+    reply: FastifyReply<ServerResponse>
+  ): Promise<any> {
+    const label = await LabelModel.findById(request.params.labelID);
+>>>>>>> update search api
 
     if (!label) {
       return reply.status(404).send(NotFound404.generate(`Label with the requested ID '${request.params.labelId}' was not found`));
@@ -155,8 +202,35 @@ class LabelController extends BaseController {
     reply.status(200);
   }
 
-  private searchLabels(request: FastifyRequest, reply: FastifyReply<ServerResponse>): void {
-    reply.send({ message: 'It has not been implemented yet.' });
+  private async searchLabels(
+    request: FastifyRequest,
+    reply: FastifyReply<ServerResponse>
+  ): Promise<any> {
+    const { name, color } = request.body;
+    if (typeof name !== 'string') {
+      return reply.status(400).send({
+        statusCode: 400,
+        error: 'Bad Request',
+        message: "Body should have required property 'name'"
+      });
+    }
+
+    if (typeof color !== 'string') {
+      return reply.status(400).send({
+        statusCode: 400,
+        error: 'Bad Request',
+        message: "Body should have required property 'color'"
+      });
+    }
+
+    const labels = await LabelModel.find({
+      name,
+      color
+    })
+      .skip(parseInt(request.query.offset) || 0)
+      .limit(parseInt(request.query.limit) || 40)
+      .lean();
+    reply.status(200).send(labels);
   }
 }
 

@@ -1,11 +1,11 @@
-async function findAll(
+async function findAllTasks(
   model,
   searchFields,
-  { search, query, offset, limit, fields, sort }
+  { search, query, offset, limit, fields, sort, body }
 ): Promise<any> {
   try {
-    console.log('dbUtils', query);
-
+    search = body.query;
+    const { creators, doers, reviewers, status } = body;
     const s = searchFields
       .filter(
         field =>
@@ -25,26 +25,28 @@ async function findAll(
             };
       });
 
-    const count = await model.countDocuments(
-      search
-        ? {
-            $or: s,
-            ...query
-          }
-        : query
-    );
+    const count = await model.countDocuments({
+      $and: [
+        { $or: s },
+        { 'creator.email': { $in: creators } },
+        { doers: { $elemMatch: { email: { $in: doers } } } },
+        { 'reviewer.email': { $in: reviewers } },
+        { status: { $in: status } }
+      ]
+    });
 
     const documents = await model
-      .find(
-        search
-          ? {
-              $or: s,
-              ...query
-            }
-          : query
-      )
+      .find({
+        $and: [
+          { $or: s },
+          { 'creator.email': { $in: creators } },
+          { doers: { $elemMatch: { email: { $in: doers } } } },
+          { 'reviewer.email': { $in: reviewers } },
+          { status: { $in: status } }
+        ]
+      })
       .skip(offset || 0)
-      .limit(limit || null)
+      .limit(limit || 40)
       .sort(
         sort
           ? JSON.parse(
@@ -81,4 +83,4 @@ async function findAll(
   }
 }
 
-export default { findAll };
+export default { findAllTasks };

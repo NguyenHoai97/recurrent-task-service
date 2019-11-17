@@ -7,22 +7,22 @@ async function findAll({
   offset,
   limit,
   fields,
-  sort
+  sort,
+  body
 }): Promise<any> {
-  console.log('search', search);
-  const { documents: recurrentTasks, count } = await dbUtils.findAll(
+  const { documents: recurrentTasks, count } = await dbUtils.findAllTasks(
     RecurrentTaskModel,
-    ['name'],
+    ['name', 'description', 'status'],
     {
       search,
       query,
       offset,
       limit,
       fields,
-      sort
+      sort,
+      body
     }
   );
-  console.log('task', recurrentTasks);
   return {
     recurrentTasks,
     count

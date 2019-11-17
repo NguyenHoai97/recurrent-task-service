@@ -79,7 +79,7 @@ class RecurrentTaskController extends BaseController {
         }
       },
       {
-        method: 'GET',
+        method: 'POST',
         url: '/search',
         handler: this.searchRecurrentTasks,
         schema: {
@@ -170,21 +170,21 @@ class RecurrentTaskController extends BaseController {
     request: FastifyRequest,
     reply: FastifyReply<ServerResponse>
   ): void {
-    reply.send({ message: 'It has not been implemented yet.' });
+    // reply.send({ message: 'It has not been implemented yet.' });
   }
 
   private getRecurrentTask(
     request: FastifyRequest,
     reply: FastifyReply<ServerResponse>
   ): void {
-    reply.send({ message: 'It has not been implemented yet.' });
+    // reply.send({ message: 'It has not been implemented yet.' });
   }
 
   private updateRecurrentTask(
     request: FastifyRequest,
     reply: FastifyReply<ServerResponse>
   ): void {
-    reply.send({ message: 'It has not been implemented yet.' });
+    // reply.send({ message: 'It has not been implemented yet.' });
   }
 
   private async deleteRecurrentTask(
@@ -195,7 +195,6 @@ class RecurrentTaskController extends BaseController {
       request.params.recurrentTaskID
     );
 
-    console.log('recuretnID', request.params.recurrentTaskID);
     if (!task) {
       return reply.status(404).send({
         statusCode: 404,
@@ -216,18 +215,20 @@ class RecurrentTaskController extends BaseController {
     request: FastifyRequest,
     reply: FastifyReply<ServerResponse>
   ): Promise<any> {
-    const { recurrentTaskID } = request.params;
-    console.log('id', recurrentTaskID);
     const { search, fields, offset, limit, sort } = request.query;
+    const { creators, doers, reviewers, status } = request.body;
+
     const query = {
       query: {},
       search,
       fields,
       offset,
       limit,
-      sort
+      sort,
+      body: {}
     };
 
+    query.body = request.body;
     if (search) query.search = search;
     if (fields) query.fields = fields.split(',');
     if (offset) query.offset = parseInt(offset, 10);
@@ -244,17 +245,22 @@ class RecurrentTaskController extends BaseController {
           query.query[q] = request.query[q];
         }
       });
-    console.log('demo', query);
     const { recurrentTasks, count } = await findAll(query);
-    reply.status(200).send({
-      statusCode: 200,
-      messages: {
-        recurrentTasks,
-        metadata: {
-          total: count
-        }
-      }
-    });
+
+    if (
+      typeof request.body.query !== 'string' ||
+      !Array.isArray(creators) ||
+      !Array.isArray(doers) ||
+      !Array.isArray(reviewers) ||
+      !Array.isArray(status)
+    ) {
+      return reply.status(400).send({
+        statusCode: 400,
+        error: 'Bad Request',
+        message: 'Body should have required property'
+      });
+    }
+    reply.status(200).send(recurrentTasks);
   }
 
   private getRecurrentTasksByUserId(request: FastifyRequest, reply: FastifyReply<ServerResponse>): void {
