@@ -12,7 +12,7 @@ async function findAll({
 }): Promise<any> {
   const { documents: recurrentTasks, count } = await dbUtils.findAllTasks(
     RecurrentTaskModel,
-    ['name', 'description', 'status'],
+    ['name', 'description', 'status', 'type', 'comment'],
     {
       search,
       query,

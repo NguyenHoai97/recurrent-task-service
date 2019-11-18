@@ -5,7 +5,7 @@ async function findAllTasks(
 ): Promise<any> {
   try {
     search = body.query;
-    const { creators, doers, reviewers, status } = body;
+    const { creators, doers, departments, reviewers, status } = body;
     const s = searchFields
       .filter(
         field =>
@@ -29,7 +29,30 @@ async function findAllTasks(
       $and: [
         { $or: s },
         { 'creator.email': { $in: creators } },
-        { doers: { $elemMatch: { email: { $in: doers } } } },
+        {
+          $or: [
+            { 'doer.email': { $in: doers } },
+            { coDoers: { $elemMatch: { email: { $in: doers } } } }
+          ]
+        },
+        {
+          $or: [
+            {
+              'department.name': {
+                $in: departments.map(department => department.trim())
+              }
+            },
+            {
+              coDepartments: {
+                $elemMatch: {
+                  name: {
+                    $in: departments.map(department => department.trim())
+                  }
+                }
+              }
+            }
+          ]
+        },
         { 'reviewer.email': { $in: reviewers } },
         { status: { $in: status } }
       ]
@@ -40,7 +63,30 @@ async function findAllTasks(
         $and: [
           { $or: s },
           { 'creator.email': { $in: creators } },
-          { doers: { $elemMatch: { email: { $in: doers } } } },
+          {
+            $or: [
+              { 'doer.email': { $in: doers } },
+              { coDoers: { $elemMatch: { email: { $in: doers } } } }
+            ]
+          },
+          {
+            $or: [
+              {
+                'department.name': {
+                  $in: departments.map(department => department.trim())
+                }
+              },
+              {
+                coDepartments: {
+                  $elemMatch: {
+                    name: {
+                      $in: departments.map(department => department.trim())
+                    }
+                  }
+                }
+              }
+            ]
+          },
           { 'reviewer.email': { $in: reviewers } },
           { status: { $in: status } }
         ]

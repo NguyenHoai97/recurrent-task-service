@@ -1,10 +1,7 @@
 import { findAll } from '@services/recurrent-tasks/RecurrentTaskService';
-// import { findAll } from '@services/recurrentTaskService';
-import { RecurrentTaskModel } from '@models/RecurrentTask';
 import { RouteOptions, FastifyRequest, FastifyReply } from 'fastify';
 import { ServerResponse } from 'http';
 import BaseController from '@routes/BaseController';
-<<<<<<< HEAD
 import RecurrentTaskSchemaModels from '@schemas/recurrent-task/models';
 import RecurrentTaskSchemaRequests from '@schemas/recurrent-task/requests';
 import CommonSchemaRequests from '@schemas/common/requests';
@@ -13,8 +10,6 @@ import { TAGS } from '@schemas/common/tags';
 import RecurrentTaskModel from '@models/RecurrentTask';
 import NotFound404 from '@models/responses/NotFound404';
 
-=======
->>>>>>> Add search api
 class RecurrentTaskController extends BaseController {
   public getRoutes(): RouteOptions[] {
     return [
@@ -38,7 +33,8 @@ class RecurrentTaskController extends BaseController {
         handler: this.getRecurrentTask,
         schema: {
           tags: [TAGS.RECURRENT_TASKS],
-          description: 'Gets detailed information about a specific recurrent task',
+          description:
+            'Gets detailed information about a specific recurrent task',
           response: {
             200: RecurrentTaskSchemaModels.RecurrentTask,
             401: CommonSchemaResponses.Unauthorized401Response,
@@ -105,7 +101,8 @@ class RecurrentTaskController extends BaseController {
         schema: {
           tags: [TAGS.RECURRENT_TASKS],
           description: 'Gets all recurrent tasks of a user',
-          querystring: RecurrentTaskSchemaRequests.GetRecurrentTasksByUserIdQueryParams,
+          querystring:
+            RecurrentTaskSchemaRequests.GetRecurrentTasksByUserIdQueryParams,
           response: {
             200: {
               description: 'A list of recurrent tasks',
@@ -120,8 +117,10 @@ class RecurrentTaskController extends BaseController {
     ];
   }
 
-<<<<<<< HEAD
-  private async createRecurrentTask(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
+  private async createRecurrentTask(
+    request: FastifyRequest,
+    reply: FastifyReply<ServerResponse>
+  ): Promise<any> {
     const newRecurrentTask = new RecurrentTaskModel(request.body);
 
     await newRecurrentTask.save();
@@ -129,21 +128,43 @@ class RecurrentTaskController extends BaseController {
     reply.send(newRecurrentTask);
   }
 
-  private async getRecurrentTask(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
-    const recurrentTask = await RecurrentTaskModel.findById(request.params.recurrentTaskId);
+  private async getRecurrentTask(
+    request: FastifyRequest,
+    reply: FastifyReply<ServerResponse>
+  ): Promise<any> {
+    const recurrentTask = await RecurrentTaskModel.findById(
+      request.params.recurrentTaskId
+    );
 
     if (!recurrentTask) {
-      return reply.status(404).send(NotFound404.generate(`Recurrent task with the requested ID '${request.params.recurrentTaskId}' was not found`));
+      return reply
+        .status(404)
+        .send(
+          NotFound404.generate(
+            `Recurrent task with the requested ID '${request.params.recurrentTaskId}' was not found`
+          )
+        );
     }
 
     reply.send(recurrentTask);
   }
 
-  private async updateRecurrentTask(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
-    const recurrentTask = await RecurrentTaskModel.findById(request.params.recurrentTaskId);
+  private async updateRecurrentTask(
+    request: FastifyRequest,
+    reply: FastifyReply<ServerResponse>
+  ): Promise<any> {
+    const recurrentTask = await RecurrentTaskModel.findById(
+      request.params.recurrentTaskId
+    );
 
     if (!recurrentTask) {
-      return reply.status(404).send(NotFound404.generate(`Recurrent task with the requested ID '${request.params.recurrentTaskId}' was not found`));
+      return reply
+        .status(404)
+        .send(
+          NotFound404.generate(
+            `Recurrent task with the requested ID '${request.params.recurrentTaskId}' was not found`
+          )
+        );
     }
 
     Object.keys(request.body).forEach(fieldToUpdate => {
@@ -155,60 +176,29 @@ class RecurrentTaskController extends BaseController {
     reply.send(recurrentTask);
   }
 
-  private async deleteRecurrentTask(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
-    const recurrentTask = await RecurrentTaskModel.findById(request.params.recurrentTaskId);
-
-    if (!recurrentTask) {
-      return reply.status(404).send(NotFound404.generate(`Recurrent task with the requested ID '${request.params.recurrentTaskId}' was not found`));
-    }
-
-    await RecurrentTaskModel.findOneAndDelete({ _id: request.params.recurrentTaskId });
-
-    reply.status(200);
-=======
-  private createRecurrentTask(
-    request: FastifyRequest,
-    reply: FastifyReply<ServerResponse>
-  ): void {
-    // reply.send({ message: 'It has not been implemented yet.' });
-  }
-
-  private getRecurrentTask(
-    request: FastifyRequest,
-    reply: FastifyReply<ServerResponse>
-  ): void {
-    // reply.send({ message: 'It has not been implemented yet.' });
-  }
-
-  private updateRecurrentTask(
-    request: FastifyRequest,
-    reply: FastifyReply<ServerResponse>
-  ): void {
-    // reply.send({ message: 'It has not been implemented yet.' });
-  }
-
   private async deleteRecurrentTask(
     request: FastifyRequest,
     reply: FastifyReply<ServerResponse>
   ): Promise<any> {
-    const task = await RecurrentTaskModel.findById(
-      request.params.recurrentTaskID
+    const recurrentTask = await RecurrentTaskModel.findById(
+      request.params.recurrentTaskId
     );
 
-    if (!task) {
-      return reply.status(404).send({
-        statusCode: 404,
-        error: 'Not Found',
-        message: 'Recurrent Task with the requested ID was not found'
-      });
+    if (!recurrentTask) {
+      return reply
+        .status(404)
+        .send(
+          NotFound404.generate(
+            `Recurrent task with the requested ID '${request.params.recurrentTaskId}' was not found`
+          )
+        );
     }
 
     await RecurrentTaskModel.findOneAndDelete({
-      _id: request.params.recurrentTaskID
+      _id: request.params.recurrentTaskId
     });
 
-    reply.status(200).send();
->>>>>>> add delete RecurrentTask
+    reply.status(200);
   }
 
   private async searchRecurrentTasks(
@@ -216,7 +206,7 @@ class RecurrentTaskController extends BaseController {
     reply: FastifyReply<ServerResponse>
   ): Promise<any> {
     const { search, fields, offset, limit, sort } = request.query;
-    const { creators, doers, reviewers, status } = request.body;
+    const { creators, doers, reviewers, departments, status } = request.body;
 
     const query = {
       query: {},
@@ -251,6 +241,7 @@ class RecurrentTaskController extends BaseController {
       typeof request.body.query !== 'string' ||
       !Array.isArray(creators) ||
       !Array.isArray(doers) ||
+      !Array.isArray(departments) ||
       !Array.isArray(reviewers) ||
       !Array.isArray(status)
     ) {
@@ -263,7 +254,10 @@ class RecurrentTaskController extends BaseController {
     reply.status(200).send(recurrentTasks);
   }
 
-  private getRecurrentTasksByUserId(request: FastifyRequest, reply: FastifyReply<ServerResponse>): void {
+  private getRecurrentTasksByUserId(
+    request: FastifyRequest,
+    reply: FastifyReply<ServerResponse>
+  ): void {
     reply.send({ message: 'It has not been implemented yet.' });
   }
 }
